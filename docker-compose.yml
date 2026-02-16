@@ -1,59 +1,32 @@
-version: '3.8'
+version: "3.8"
 
 services:
+  openai-proxy:
+    build: ./proxy
+    container_name: openai-proxy
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=https://api.openai.com/v1
+      - PORT=8000
+    ports:
+      - "127.0.0.1:8000:8000"
+
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
     restart: unless-stopped
-    ports:
-      # Bind to localhost only for security (change to 0.0.0.0:3000 for external access)
-      - "127.0.0.1:3000:8080"
+    depends_on:
+      - openai-proxy
     environment:
-      # OpenAI API Configuration
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL:-https://api.openai.com/v1}
-
-      # Disable Ollama (we're using OpenAI only)
-      - ENABLE_OLLAMA_API=false
-
-      # Enable OpenAI API
+      - OPENAI_API_BASE_URL=http://openai-proxy:8000/v1
       - ENABLE_OPENAI_API=true
-
-      # Optional: Set default OpenAI model
-      - OPENAI_API_MODEL=${OPENAI_API_MODEL:-gpt-4o}
-
-      # RAG Configuration
-      # Open WebUI uses its own internal vector storage (ChromaDB)
-      # Documents and embeddings are stored in the persisted volume
-
-      # Security: Disable signup if you want invite-only
-      # - WEBUI_AUTH=true
-      # - ENABLE_SIGNUP=false
-
+      - ENABLE_OLLAMA_API=false
+    ports:
+      - "127.0.0.1:3002:8080"
     volumes:
-      # Persist all Open WebUI data including:
-      # - User data, chat history
-      # - Uploaded documents
-      # - Vector embeddings (ChromaDB)
-      # - Model configurations
       - open-webui-data:/app/backend/data
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-    # Optional: Resource limits
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '2.0'
-    #       memory: 4G
-    #     reservations:
-    #       memory: 1G
 
 volumes:
   open-webui-data:
-    name: open-webui-data
