@@ -189,15 +189,17 @@ async def chat_completions(request: Request):
             if is_streaming:
                 # Handle streaming response
                 async def stream_generator():
-                    async with client.stream(
-                        "POST",
-                        endpoint,
-                        headers=headers,
-                        json=responses_body
-                    ) as response:
-                        response.raise_for_status()
-                        async for chunk in response.aiter_bytes():
-                            yield chunk
+                    async with httpx.AsyncClient(timeout=None) as client:
+                        async with client.stream(
+                            "POST",
+                            endpoint,
+                            headers=headers,
+                            json=responses_body
+                        ) as response:
+                            response.raise_for_status()
+                            async for chunk in response.aiter_bytes():
+                                if chunk:
+                                    yield chunk
 
                 return StreamingResponse(
                     stream_generator(),
@@ -205,11 +207,12 @@ async def chat_completions(request: Request):
                 )
             else:
                 # Handle non-streaming response
-                response = await client.post(
-                    endpoint,
-                    headers=headers,
-                    json=responses_body
-                )
+                async with httpx.AsyncClient(timeout=120.0) as client:
+                    response = await client.post(
+                        endpoint,
+                        headers=headers,
+                        json=responses_body
+                    )
                 response.raise_for_status()
 
                 result = response.json()
