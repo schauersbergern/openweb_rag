@@ -3,18 +3,18 @@ version: "3.8"
 services:
   openai-proxy:
     build: ./proxy
-    container_name: openai-proxy
+    container_name: rag-openai-proxy
     restart: unless-stopped
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_BASE_URL=https://api.openai.com/v1
       - PORT=8000
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8010:8000"
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
-    container_name: open-webui
+    container_name: rag-open-webui
     restart: unless-stopped
     depends_on:
       - openai-proxy
@@ -24,7 +24,7 @@ services:
       - ENABLE_OPENAI_API=true
       - ENABLE_OLLAMA_API=false
     ports:
-      - "127.0.0.1:3002:8080"
+      - "127.0.0.1:3010:8080"
     volumes:
       - open-webui-data:/app/backend/data
 
