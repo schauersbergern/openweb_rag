@@ -1,0 +1,69 @@
+/* ============================================================
+   custom_styles.css — Open WebUI
+   Minimalism first. Build up iteratively.
+   ============================================================ */
+
+/* ---------- Typography ---------- */
+/* Force Inter consistently — Open WebUI's stack starts with -apple-system,
+   which means Mac users see San Francisco, Linux/Windows see Inter.
+   Pinning Inter unifies the look across platforms. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+html, body, button, input, select, textarea {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif !important;
+  font-feature-settings: 'cv11', 'ss01', 'ss03'; /* Inter's stylistic alternates: cleaner numbers, single-story a */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code, pre, kbd, samp, .font-mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace !important;
+  font-feature-settings: 'calt', 'liga';
+}
+
+/* Slightly tighter, more confident headings */
+h1, h2, h3, h4 {
+  letter-spacing: -0.012em;
+}
+
+/* Tabular numerals where they matter (timestamps, counts) */
+time, .timestamp, [data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Focus states ---------- */
+/* Cleaner, more accessible — softer than the default ring */
+*:focus-visible {
+  outline: 2px solid oklch(54.6% .245 262.881 / 0.6); /* matches --color-blue-600 with alpha */
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Scrollbars ---------- */
+/* Thin, unobtrusive — Webkit + Firefox */
+* { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.15) transparent; }
+html.dark * { scrollbar-color: rgba(255,255,255,0.15) transparent; }
+
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.15);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html.dark *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.30); background-clip: padding-box; }
+html.dark *::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.30); background-clip: padding-box; }
+
+/* ---------- Selection ---------- */
+::selection {
+  background: oklch(54.6% .245 262.881 / 0.20);
+  color: inherit;
+}
+
+/* ---------- Subtle transitions ---------- */
+/* Buttons and interactive elements gain a touch more polish on hover */
+button, a {
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease, opacity 140ms ease;
+}

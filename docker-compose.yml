@@ -27,6 +27,7 @@ services:
       - "127.0.0.1:3010:8080"
     volumes:
       - open-webui-data:/app/backend/data
+      - ./custom_styles.css:/app/build/static/custom.css:ro
 
 volumes:
   open-webui-data:
